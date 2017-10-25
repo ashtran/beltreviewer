@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang= "en">
+  <head>
+    <meta charset="utf-8">
+    <title>Stalk other Users</title>
+    <meta name="description" content= "Insert description of webpage">
+  </head>
+  <body>
+    <div id="container">
+      <div id="title">
+        <h2>User Alias: {{user.first_name}}!</h2>
+        <p>Name: {{user.first_name}} {{user.last_name}}</p>
+        <p>Email: {{user.email}}</p>
+        <p>Total Reviews: {{user.user_reviews.count}}</p>
+      </div>
+      <div class="reviews">
+        <h3>Posted Reviews on the following books:</h3>
+        {% for book in reviewedbooks %}
+          <p><a href="/reviews/{{book.id}}">{{book.title}}</a></p>
+        {% endfor %}
+      </div>
+    </div>
+  </body>
+</html>

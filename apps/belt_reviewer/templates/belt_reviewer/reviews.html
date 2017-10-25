@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang= "en">
+  <head>
+    <meta charset="utf-8">
+    <title>Book Reviews</title>
+    <meta name="description" content= "Insert description of webpage">
+  </head>
+  <body>
+    <div id="container">
+      <div id="title">
+        <h2> {{book.title}}!</h2>
+        <p>{{book.author.name}}</p>
+      </div>
+      <div class="reviews">
+        <h3>Reviews:</h3>
+        <p>Rating: {{review.rating}}</p>
+        <p><a href="/user/{{review.reviewer_id}}">{{review.reviewer.first_name}}</a> says: {{review.desc}}</p>
+        <p>Posted on:{{review.created_at}}</p>
+      </div>
+    </div>
+
+  </body>
+</html>
