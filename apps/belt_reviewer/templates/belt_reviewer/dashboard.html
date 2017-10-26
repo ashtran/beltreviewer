@@ -9,19 +9,21 @@
     <div id="container">
       <div class="title">
         <h2>Welcome, {{user.first_name}}!</h2>
+        <p><a href="/addbook">Add Book and Review</a>  <a href="/logout">Logout</a></p>
       </div>
       <div class= "recentreviews">
-        <h3>Recent Book Reviews:</h3>
-        {% for review in recentreviews %}
-        <p>Rating: {{review.rating}}</p>
-        <p><a href="/user/{{review.reviewer_id}}">{{review.reviewer.first_name}}</a> says: {{review.desc}}</p>
-        <p>Posted on:{{review.created_at}}</p>
+        <h4>Recent Book Reviews:</h4>
+        {% for k in recentreviews %}
+        <h4><a href="/reviews/{{k.book.id}}">{{k.book.title}}</a></h4>
+        <p>Rating: {{k.rating}}</p>
+        <p><a href="/user/{{k.reviewer_id}}">{{k.reviewer.first_name}}</a> says: {{k.desc}}</p>
+        <p>Posted on:{{k.created_at}}</p>
         {% endfor %}
       </div>
       <div class="otherbooks">
         <h3> Other Books with Reviews:</h3>
-        {% for book in reviewedbooks %}
-          <p><a href="/reviews/{{book.id}}">{{book.title}}</a></p>
+        {% for k in booksreviewed %}
+          <p><a href="/reviews/{{k.book.id}}">{{k.book.title}}</a></p>
         {% endfor %}
       </div>
   </div>

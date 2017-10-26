@@ -9,22 +9,27 @@
     <div id= "container">
       <div class="title">
         <h2>Add a New Book Title and a Review:</h2>
+        <p><a href="/dashboard">Home</a>  <a href="/addbook">Add Book and Review</a>   <a href="/logout">Logout</a></p>
+      </div>
       </div>
       <div class="main">
         {% if messages %}
-          {% for message in messages%}
-        <p>{{ message }}</p>
+          {% for k in messages%}
+        <p>{{ k }}</p>
           {% endfor %}
         {% endif %}
         <form action="/processbook" method="post">
         {% csrf_token %}
           <p>Book Title: <input type="text" name="title"></p>
-          <p>Choose from list:
+          <p>Choose Author from list:
             <select name="name">
-              <option></option>
+              {% for k in authors %}
+              <option value="{{k.name}}">{{k.name}}</option>
+              {% endfor %}
             </select>
           </p>
-          <p>Add a new author: <input type="text" name="name"></p>
+          <p>Add a new author: <input type="text" name="name">
+          </p>
           <p>Review:
             <textarea name="desc" cols="50" rows="5"></textarea>
           </p>

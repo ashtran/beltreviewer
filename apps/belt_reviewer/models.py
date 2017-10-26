@@ -4,7 +4,7 @@ import bcrypt
 from django.db import models
 
 EMAIL_REGEX=re.compile(r'^[a-zA-Z0-9\.\+_-]+@[a-zA-Z0-9\._-]+\.[a-zA-Z]*$')
-NAME_REGEX=re.compile(r'^[a-zA-Z]$')
+NAME_REGEX=re.compile(r'^[a-zA-Z]+$')
 
 class UserManager(models.Manager):
     def validate_login(self,post_data):
@@ -44,12 +44,12 @@ class UserManager(models.Manager):
             if field == "email":
                 if not field in errors and not re.match(EMAIL_REGEX, post_data[field]):
                     errors[field]="Invalid {}".format(field)
-                elif len(self.filter(email=post_data['email']))> 1:
+                elif len(self.filter(email=post_data['email']))> 0:
                     errors[field]= "{} is already in use".format(field)
 
         return errors
 
-    def valid_user(self,post_data):
+    def create_user(self,post_data):
         hashed= bcrypt.hashpw(post_data['password'].encode(), bcrypt.gensalt(5))
         new_user= self.create(
             first_name= post_data['first_name'],
@@ -71,17 +71,7 @@ class User(models.Model):
         return "id:{} first_name:{} last_name:{} email:{} created_at:{} updated_at:{}".format(self.id,self.first_name,self.last_name,self.email,self.created_at,self.updated_at)
 
 class AuthorManager(models.Manager):
-    def validate_author(self,post_data):
-        authorerrors={}
-        for field,value in post_data.iteritems():
-            if field == "name":
-                if len(value)<1:
-                    authorerrors[field]="{} field is required".format(field.replace('_',' '))
-                if len(self.filter(name=post_data['name']))> 1:
-                    authorerrors[field]= "{} has already been submitted".format(field)
-        return authorerrors
-
-    def valid_author(self,post_data):
+    def create_author(self,post_data):
         new_author= self.create(
             name= post_data['name']
         )
@@ -96,17 +86,8 @@ class Author(models.Model):
         return "id {} name{} books{}".format(self.id, self.name,self.books)
 
 class BookManager(models.Manager):
-    def validate_book(self,post_data):
-        bookerrors={}
-        for field,value in post_data.iteritems():
-            if field == "title":
-                if len(value)<1:
-                    bookerrors[field]="{} field is required".format(field.replace('_',' '))
-                if len(self.filter(title=post_data['title']))> 1:
-                    bookerrors[field]= "{} has already been submitted".format(field)
-        return bookerrors
 
-    def valid_book(self,post_data,author_id):
+    def create_book(self,post_data,author_id):
         new_book= self.create(
             title= post_data['title'],
             author_id=author_id
@@ -124,28 +105,42 @@ class Book(models.Model):
 
 
 class ReviewManager(models.Manager):
-    def validate_review(self,post_data,user_id):
-        reviewerrors={}
-        entryerrors={}
-        bookerrors = Book.objects.validate_book(post_data)
-        authorerrors= Author.objects.validate_author(post_data)
-        if len(bookerrors):
-            for field, value in bookerrors.iteritems():
-                entryerrors[field]=bookerrors
-        if len(authorerrors):
-            for field, value in authorerrors.iteritems():
-                entryerrors[field]=authorerrors
-        for field,value in post_data.iteritems():
-            if field == "desc":
-                if len(value)<1:
-                    reviewerrors[field]="{} field is required".format(field.replace('_',' '))
-                    entryerrors[field]=reviewerrors
-            if len(self.filter(reviewer_id=user_id))> 1:
-                reviewerrors[field]= "{} has already been submitted".format(field)
-                entryerrors[field]=reviewerrors
-        return entryerrors
+    def validate_newreview(self,post_data,user_id):
 
-    def valid_review(self,post_data,book_id,user_id):
+        errors={}
+
+        for field,value in post_data.iteritems():
+
+            if len(value)<1:
+                errors[field]="{} field is required".format(field.replace('_',' '))
+
+            elif field == "name":
+                if not field in errors and len(Author.objects.filter(name=post_data['name']))> 0:
+                    errors[field]= "{} has already been submitted".format(field)
+
+            elif field == "title":
+                if not field in errors and len(Book.objects.filter(title=post_data['title']))> 0:
+                    errors[field]= "{} has already been submitted".format(field)
+
+        return errors
+
+    def validate_review(self,post_data,user_id,book_id):
+
+        errors={}
+
+        for field,value in post_data.iteritems():
+
+            if len(self.filter(reviewer_id=user_id,book_id=book_id))> 0:
+                errors[field]= "User has already submitted a review"
+
+            if len(value)<1:
+                errors[field]="{} field is required".format(field.replace('_',' '))
+
+
+
+        return errors
+
+    def add_review(self,post_data,book_id,user_id):
         new_review= self.create(
             desc= post_data['desc'],
             rating= post_data['rating'],

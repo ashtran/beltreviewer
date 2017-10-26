@@ -8,6 +8,7 @@
   <body>
     <div id="container">
       <div id="title">
+        <p><a href="/dashboard">Home</a>  <a href="/addbook">Add Book and Review</a>   <a href="/logout">Logout</a></p>
         <h2>User Alias: {{user.first_name}}!</h2>
         <p>Name: {{user.first_name}} {{user.last_name}}</p>
         <p>Email: {{user.email}}</p>
@@ -15,8 +16,8 @@
       </div>
       <div class="reviews">
         <h3>Posted Reviews on the following books:</h3>
-        {% for book in reviewedbooks %}
-          <p><a href="/reviews/{{book.id}}">{{book.title}}</a></p>
+        {% for k in reviewedbooks %}
+          <p><a href="/reviews/{{k.book.id}}">{{k.book.title}}</a></p>
         {% endfor %}
       </div>
     </div>

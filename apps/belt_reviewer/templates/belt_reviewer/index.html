@@ -9,13 +9,13 @@
     <div class="registration">
       <h2>Registration</h2>
       {% if messages %}
-        {% for message in messages%}
-      <p {% if message.tags %} class="{{ message.tags }}" {% endif %} >
-        {{ message }}
+        {% for k in messages%}
+      <p {% if k.tags %} class="{{ k.tags }}" {% endif %} >
+        {{ k }}
       </p>
         {% endfor %}
       {% endif %}
-      <form action="/create" method="post">
+      <form action="/createuser" method="post">
       {% csrf_token %}
         <p>First Name:<input type="text" name="first_name"></p>
         <p>Last Name:<input type="text" name="last_name"></p>
