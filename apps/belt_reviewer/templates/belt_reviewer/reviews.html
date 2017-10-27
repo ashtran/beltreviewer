@@ -13,11 +13,16 @@
         <p>{{book.author.name}}</p>
       </div>
       <div class="reviews">
-        {% for k in review%}
         <h3>Reviews:</h3>
+        {% for k in review%}
         <p>Rating: {{k.rating}}</p>
         <p><a href="/user/{{k.reviewer_id}}">{{k.reviewer.first_name}}</a> says: {{k.desc}}</p>
         <p>Posted on:{{k.created_at}}</p>
+            {% for v in user_reviews %}
+                {% if v.reviewer_id is k.reviewer_id %}
+            <p><a href="/remove/{{k.book_id}}">Delete this review</a></p>
+                {% endif %}
+            {% endfor %}
         {% endfor %}
       </div>
       <div class="main">

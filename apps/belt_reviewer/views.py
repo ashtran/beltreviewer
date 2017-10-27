@@ -25,7 +25,7 @@ def login(request):
             error(request, message, extra_tags=field)
         return redirect('/')
     else:
-        user= User.objects.valid_login(request.POST)
+        user= User.objects.filter(email=request.POST['email'])[0]
         request.session['user_id']=user.id
         return redirect('/dashboard')
 
@@ -72,16 +72,28 @@ def processbook(request):
         return redirect('/reviews/{}'.format(new_book.id))
 
 def reviews(request, book_id):
-    # try:
-    #     request.session['book_id']
-    # except KeyError:
-    #     return redirect('/addbook')
+    review=Review.objects.filter(book_id=book_id)
+    user_reviews=Review.objects.filter(reviewer_id=request.session['user_id'],book_id=book_id)
+
+    try:
+        request.session['user_id']
+        user_reviews=user_reviews
+    except KeyError:
+        return
+
     context={
-        'book':Book.objects.get(id=book_id),
-        'review':Review.objects.filter(book_id=book_id),
-        'authors':Author.objects.all()
+        'book': Book.objects.get(id=book_id),
+        'review': review,
+        'authors': Author.objects.all(),
+        'user_reviews': user_reviews,
+        'user':request.session['user_id']
     }
     return render(request, 'belt_reviewer/reviews.html',context)
+
+def delete(request,book_id):
+    delete_review=Review.objects.filter(book_id=book_id,reviewer_id=request.session['user_id']).delete()
+    print delete_review
+    return redirect('/reviews/{}'.format(book_id))
 
 def addreview(request,book_id):
     errors=Review.objects.validate_review(request.POST,request.session['user_id'],book_id)
