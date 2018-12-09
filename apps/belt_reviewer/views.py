@@ -10,7 +10,7 @@ def index(request):
 def createuser(request):
     errors= User.objects.validate_registration(request.POST)
     if len(errors):
-        for field, message in errors.iteritems():
+        for field, message in errors.items():
             error(request, message, extra_tags=field)
         return redirect('/')
     else:
@@ -21,7 +21,7 @@ def createuser(request):
 def login(request):
     errors= User.objects.validate_login(request.POST)
     if len(errors):
-        for field, message in errors.iteritems():
+        for field, message in errors.items():
             error(request, message, extra_tags=field)
         return redirect('/')
     else:
@@ -60,7 +60,7 @@ def addbook(request):
 def processbook(request):
     errors= Review.objects.validate_newreview(request.POST,request.session['user_id'])
     if len(errors):
-        for field, message in errors.iteritems():
+        for field, message in errors.items():
             error(request, message, extra_tags=field)
         return redirect('/addbook')
 
@@ -92,13 +92,13 @@ def reviews(request, book_id):
 
 def delete(request,book_id):
     delete_review=Review.objects.filter(book_id=book_id,reviewer_id=request.session['user_id']).delete()
-    print delete_review
+    #print delete_review
     return redirect('/reviews/{}'.format(book_id))
 
 def addreview(request,book_id):
     errors=Review.objects.validate_review(request.POST,request.session['user_id'],book_id)
     if len(errors):
-        for field, message in errors.iteritems():
+        for field, message in errors.items():
             error(request,message, extra_tags=field)
             return redirect('/reviews/{}'.format(book_id))
     else:

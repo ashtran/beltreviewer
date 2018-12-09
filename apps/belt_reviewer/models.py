@@ -14,6 +14,7 @@ class UserManager(models.Manager):
         # <- Get Login Email -> #
         if len(login)>0:
             user=login[0]
+            print (user.password)
             # <- Password -> #
             if not bcrypt.checkpw(post_data['password'].encode(), user.password.encode()):
                 errors['login']="Email/password is incorrect"
@@ -26,7 +27,7 @@ class UserManager(models.Manager):
 # <--- Validate User Registration---> #
     def validate_registration(self,post_data):
         errors={}
-        for field,value in post_data.iteritems():
+        for field,value in post_data.items():
             # <- Blank Entry -> #
             if len(value)<1:
                 errors[field]="{} field is required".format(field.replace('_',' '))
@@ -54,12 +55,13 @@ class UserManager(models.Manager):
 # <--- Create User Account ---> #
     def create_user(self,post_data):
         # <- Encode Password w/ Bcrypt -> #
-        hashed= bcrypt.hashpw(post_data['password'].encode(), bcrypt.gensalt(5))
+        hashed= bcrypt.hashpw(post_data['password'].encode(), bcrypt.gensalt())
         new_user= self.create(
             first_name= post_data['first_name'],
             last_name= post_data['last_name'],
             email= post_data['email'],
             password= hashed
+            #password=post_data['password']
         )
         return new_user
 
@@ -112,7 +114,7 @@ class BookManager(models.Manager):
 class Book(models.Model):
 # <--- Book Attributes ---> #
     title= models.CharField(max_length=255,null=True)
-    author=models.ForeignKey(Author,related_name="books",null=True)
+    author=models.ForeignKey(Author,related_name="books",null=True, on_delete=models.PROTECT)
 
     created_at= models.DateTimeField(auto_now_add=True)
     updated_at= models.DateTimeField(auto_now=True)
@@ -127,7 +129,7 @@ class ReviewManager(models.Manager):
 # <--- Validate New Review Entry ---> #
     def validate_newreview(self,post_data,user_id):
         errors={}
-        for field,value in post_data.iteritems():
+        for field,value in post_data.items():
             # <- Blank Field -> #
             if len(value)<1:
                 errors[field]="{} field is required".format(field.replace('_',' '))
@@ -144,7 +146,7 @@ class ReviewManager(models.Manager):
 # <--- Validate Add Review ---> #
     def validate_review(self,post_data,user_id,book_id):
         errors={}
-        for field,value in post_data.iteritems():
+        for field,value in post_data.items():
             # <- User Review Exists -> #
             if len(self.filter(reviewer_id=user_id,book_id=book_id))> 0:
                 errors[field]= "User has already submitted a review"
@@ -169,8 +171,8 @@ class Review(models.Model):
     rating= models.IntegerField()
     created_at= models.DateTimeField(auto_now_add=True)
     updated_at= models.DateTimeField(auto_now=True)
-    reviewer=models.ForeignKey(User, related_name="user_reviews", null=True)
-    book=models.ForeignKey(Book, related_name="book_reviews", null=True)
+    reviewer=models.ForeignKey(User, related_name="user_reviews", null=True, on_delete=models.PROTECT)
+    book=models.ForeignKey(Book, related_name="book_reviews", null=True,on_delete=models.PROTECT)
     objects = ReviewManager()
     # <- Print class attributes -> #
     def __repr__(self):
