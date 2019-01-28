@@ -14,9 +14,9 @@ class UserManager(models.Manager):
         # <- Get Login Email -> #
         if len(login)>0:
             user=login[0]
-            print (user.password)
+            hashed = bcrypt.hashpw(post_data['password'].encode(), bcrypt.gensalt())
             # <- Password -> #
-            if not bcrypt.checkpw(post_data['password'].encode(), user.password.encode()):
+            if not bcrypt.checkpw(user.password.encode(), hashed):
                 errors['login']="Email/password is incorrect"
         # <- Blank Field -> #
         else:
@@ -54,14 +54,11 @@ class UserManager(models.Manager):
 
 # <--- Create User Account ---> #
     def create_user(self,post_data):
-        # <- Encode Password w/ Bcrypt -> #
-        hashed= bcrypt.hashpw(post_data['password'].encode(), bcrypt.gensalt())
         new_user= self.create(
             first_name= post_data['first_name'],
             last_name= post_data['last_name'],
             email= post_data['email'],
-            password= hashed
-            #password=post_data['password']
+            password= post_data['password']
         )
         return new_user
 
